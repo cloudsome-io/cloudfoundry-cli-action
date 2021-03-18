@@ -24,6 +24,6 @@ inputs:
     required: true
 runs:
   using: "docker"
-  image: "elliottpope/cloudfoundry-cli-action:v6"
+  image: "ellpope/cloudfoundry-cli-action:v6"
   args:
     - ${{ inputs.command }}
