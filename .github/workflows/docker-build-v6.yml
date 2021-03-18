@@ -16,7 +16,7 @@ jobs:
     - name: Get Version
       id: get_version
       run: |
-        VERSION=$(docker run -it --entrypoint "/bin/bash" elliottpope/cloudfoundry-cli-action:v6 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
+        VERSION=$(docker run --entrypoint "/bin/bash" elliottpope/cloudfoundry-cli-action:v6 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
         echo "CF CLI Version is ${VERSION}"
         echo "::set-output name=version::$(echo ${VERSION})"
     - name: Tag Docker Image
