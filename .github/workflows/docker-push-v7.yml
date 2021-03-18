@@ -14,14 +14,14 @@ jobs:
     - name: Login to DockerHub
       run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag elliottpope/cloudfoundry-cli-action:v7
+      run: docker build . --file Dockerfile --tag ellpope/cloudfoundry-cli-action:v7
     - name: Get Version
       id: get_version
       run: |
-        VERSION=$(docker run --entrypoint "/bin/bash" elliottpope/cloudfoundry-cli-action:v7 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
+        VERSION=$(docker run --entrypoint "/bin/bash" ellpope/cloudfoundry-cli-action:v7 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
         echo "CF CLI Version is ${VERSION}"
         echo "::set-output name=version::$(echo ${VERSION})"
     - name: Tag Docker Image
-      run: docker tag elliottpope/cloudfoundry-cli-action:v7 elliottpope/cloudfoundry-cli-action:${{ steps.get_version.outputs.version }}
+      run: docker tag ellpope/cloudfoundry-cli-action:v7 ellpope/cloudfoundry-cli-action:${{ steps.get_version.outputs.version }}
     - name: Push Docker Image
-      run: docker push -a elliottpope/cloudfoundry-cli-action
+      run: docker push -a ellpope/cloudfoundry-cli-action
