@@ -3,7 +3,7 @@ FROM alpine:latest
 RUN apk update
 RUN apk add --no-cache curl jq bash ca-certificates
 
-ENV CF_CLI_VERSION "6.53.0"
+ENV CF_CLI_VERSION "7.2.0"
 
 RUN curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=6.53.0&source=github-rel" | tar -zx -C /usr/local/bin
 
