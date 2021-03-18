@@ -27,4 +27,4 @@ jobs:
     - name: Tag Docker Image
       run: docker tag elliottpope/cloudfoundry-cli-action:v7 elliottpope/cloudfoundry-cli-action:${{ steps.get_version.outputs.version }}
     - name: Push Docker Image
-      run: docker push -a elliottpope/cloudfoundry-cli-action:v7
+      run: docker push -a elliottpope/cloudfoundry-cli-action
