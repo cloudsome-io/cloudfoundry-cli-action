@@ -1,0 +1,29 @@
+name: "Cloud Foundry CLI GitHub Action"
+description: "Run arbitrary commands using the CF CLI on GitHub Actions"
+branding:
+  icon: "upload-cloud"
+  color: "blue"
+inputs:
+  CF_API:
+    description: "Target API Endpoint of Cloud Foundry"
+    required: true
+  USERNAME:
+    description: "Username for API authentication"
+    required: true
+  PASSWORD:
+    description: "Password for API authentication"
+    required: true
+  ORG:
+    description: "Target Organization"
+    required: false
+  SPACE:
+    description: "Target Space"
+    required: false
+  COMMAND:
+    description: "Command to run using CF CLI"
+    required: true
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.command }}
