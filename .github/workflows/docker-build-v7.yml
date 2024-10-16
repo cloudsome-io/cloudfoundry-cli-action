@@ -12,12 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag cosmos61/cloudfoundry-cli-action:v7
+        run: docker build . --file Dockerfile --tag deltahf/cloudfoundry-cli-action:v7
       - name: Get Version
         id: get_version
         run: |
-          VERSION=$(docker run --entrypoint "/bin/bash" cosmos61/cloudfoundry-cli-action:v7 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
+          VERSION=$(docker run --entrypoint "/bin/bash" deltahf/cloudfoundry-cli-action:v7 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
           echo "CF CLI Version is ${VERSION}"
           echo "::set-output name=version::$(echo ${VERSION})"
       - name: Tag Docker Image
-        run: docker tag cosmos61/cloudfoundry-cli-action:v7 cosmos61/cloudfoundry-cli-action:${{ steps.get_version.outputs.version }}
+        run: docker tag deltahf/cloudfoundry-cli-action:v7 deltahf/cloudfoundry-cli-action:${{ steps.get_version.outputs.version }}
