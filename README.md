@@ -22,7 +22,7 @@ jobs:
     deploy:
         runs-on: ubuntu-latest
         steps:
-        - uses: elliottpope/cloudfoundry-cli-action@v6
+        - uses: cosmos61/cloudfoundry-cli-action@v7
           with:
             CF_API: https://api.my-cloud-foundry.com
             USERNAME: ${{ secrets.CF_USER }}

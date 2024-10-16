@@ -9,18 +9,18 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Login to DockerHub
-      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ellpope/cloudfoundry-cli-action:v7
-    - name: Get Version
-      id: get_version
-      run: |
-        VERSION=$(docker run --entrypoint "/bin/bash" ellpope/cloudfoundry-cli-action:v7 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
-        echo "CF CLI Version is ${VERSION}"
-        echo "::set-output name=version::$(echo ${VERSION})"
-    - name: Tag Docker Image
-      run: docker tag ellpope/cloudfoundry-cli-action:v7 ellpope/cloudfoundry-cli-action:${{ steps.get_version.outputs.version }}
-    - name: Push Docker Image
-      run: docker push -a ellpope/cloudfoundry-cli-action
+      - uses: actions/checkout@v2
+      - name: Login to DockerHub
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag cosmos61/cloudfoundry-cli-action:v7
+      - name: Get Version
+        id: get_version
+        run: |
+          VERSION=$(docker run --entrypoint "/bin/bash" cosmos61/cloudfoundry-cli-action:v7 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
+          echo "CF CLI Version is ${VERSION}"
+          echo "::set-output name=version::$(echo ${VERSION})"
+      - name: Tag Docker Image
+        run: docker tag cosmos61/cloudfoundry-cli-action:v7 cosmos61/cloudfoundry-cli-action:${{ steps.get_version.outputs.version }}
+      - name: Push Docker Image
+        run: docker push -a cosmos61/cloudfoundry-cli-action
