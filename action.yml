@@ -1,4 +1,4 @@
-name: "Cloud Foundry CLI GitHub Action"
+name: "Cloudsome Cloud Foundry CLI GitHub Action"
 description: "Run arbitrary commands using the CF CLI on GitHub Actions"
 branding:
   icon: "upload-cloud"
