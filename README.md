@@ -22,12 +22,25 @@ jobs:
     deploy:
         runs-on: ubuntu-latest
         steps:
-        - uses: cloudsome-io/cloudfoundry-cli-action@v7
+        - uses: cloudsome-io/cloudfoundry-cli-action@v7.4.6
           with:
             CF_API: https://api.my-cloud-foundry.com
             USERNAME: ${{ secrets.CF_USER }}
             PASSWORD: ${{ secrets.CF_PASSWORD }}
             ORG: my-org
             SPACE: dev
-            COMMAND: push my-app
+            COMMAND: cf push <app-name>
+```
+
+## blue green deployment
+For blue green deployment, you can use the `blue-green.sh` script to deploy your app.  
+This script will deploy the app to the staging space and then swap the routes to point to the new app.
+
+```yml
+- uses: cloudsome-io/cloudfoundry-cli-action@v7.4.6
+  with:
+    CF_API: https://api.my-cloud-foundry.com
+    USERNAME: ${{ secrets.CF_USER }}
+    PASSWORD: ${{ secrets.CF_PASSWORD }}
+    COMMAND: blue-green <app-name>
 ```
