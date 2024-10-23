@@ -8,4 +8,8 @@ ENV CF_CLI_VERSION "7.2.0"
 RUN curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github-rel" | tar -zx -C /usr/local/bin
 
 ADD entrypoint.sh /entrypoint.sh
+
+COPY blue-green.sh /usr/local/bin/blue-green
+RUN chmod +x /usr/local/bin/blue-green
+
 ENTRYPOINT ["/entrypoint.sh"]
