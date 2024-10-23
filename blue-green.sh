@@ -14,3 +14,5 @@ if cf app $1 > /dev/null 2>&1 ; then
     fi
   fi
 fi
+
+cf delete-orphaned-routes -f
