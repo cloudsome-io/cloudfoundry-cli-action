@@ -35,6 +35,10 @@ jobs:
 ## blue green deployment
 For blue green deployment, you can use the `blue-green.sh` script to deploy your app.  
 This script will deploy the app to the staging space and then swap the routes to point to the new app.
+Optionally you can specify
+* `--stack` the stack name specification
+* `--source` and `--destination` The name of the source app and destination app for adding the network policy that will allow the communication between them
+
 
 ```yml
 - uses: cloudsome-io/cloudfoundry-cli-action@v7.4.6
@@ -42,5 +46,5 @@ This script will deploy the app to the staging space and then swap the routes to
     CF_API: https://api.my-cloud-foundry.com
     USERNAME: ${{ secrets.CF_USER }}
     PASSWORD: ${{ secrets.CF_PASSWORD }}
-    COMMAND: blue-green <app-name>
+    COMMAND: blue-green <app-name> [--stack stack_name] [--source source_app --destination destination_app]
 ```
