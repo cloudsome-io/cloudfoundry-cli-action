@@ -68,6 +68,7 @@ fi
 # Add network policy if both SOURCE and DESTINATION are set
 if [[ -n "$SOURCE" && -n "$DESTINATION" ]]; then
   cf add-network-policy "$SOURCE" "$DESTINATION" || { echo "Failed to add network policy"; exit 1; }
+  cf restart "$SOURCE" || { echo "Failed to restart $SOURCE for network policy set up"; exit 1; }
 fi
 
 # Verify if the new app is running
