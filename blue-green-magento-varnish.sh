@@ -89,7 +89,7 @@ cf push -f $VARNISH_MANIFEST || { echo "Failed to push varnish"; exit 1; }
 
 # Add network policy if both SOURCE and DESTINATION are set
 echo "Adding network policy for communicate vanrnish to mongo"
-cf add-network-policy varnish "$DESTINATION" || { echo "Failed to add network policy"; exit 1; }
+cf add-network-policy varnish "$APP_NAME" || { echo "Failed to add network policy"; exit 1; }
 cf restart varnish || { echo "Failed to restart $SOURCE for network policy set up"; exit 1; }
 
 # Verify if the new app is running
