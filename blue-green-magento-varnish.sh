@@ -1,17 +1,11 @@
 #!/bin/bash
 
-SOURCE=""
-DESTINATION=""
 MANIFEST="./manifest.yml"
 STACK=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --varnish-manifest)
-      VARNISH_MANIFEST="$2"
-      shift # Skip the value
-      ;;
     --stack)
       STACK="$2"
       shift # Skip the value
@@ -37,21 +31,9 @@ if [[ -z "$APP_NAME" ]]; then
   exit 1
 fi
 
-# Ensure VARNISH_MANIFEST is provided
-if [[ -z "$VARNISH_MANIFEST" ]]; then
-  echo "Error: -varnis-manifest path is required."
-  exit 1
-fi
-
 # Check for manifest file
 if [[ ! -f $MANIFEST ]]; then
   echo "Error: $MANIFEST not found in the current directory."
-  exit 1
-fi
-
-# Check for manifest file
-if [[ ! -f $VARNISH_MANIFEST ]]; then
-  echo "Error: $VARNISH_MANIFEST not found in the current directory."
   exit 1
 fi
 
@@ -60,37 +42,23 @@ if cf app "$APP_NAME-old" > /dev/null 2>&1; then
   cf delete "$APP_NAME-old" -f || { echo "Failed to delete $APP_NAME-old"; exit 1; }
 fi
 
-# Check if the varnish exists and manage old app versions
-if cf app "varnish-old" > /dev/null 2>&1; then
-  cf delete "varnish-old" -f || { echo "Failed to delete varnish-old"; exit 1; }
-fi
-
 # Rename actual app version to -old
 if cf app "$APP_NAME" > /dev/null 2>&1; then
   cf rename "$APP_NAME" "$APP_NAME-old" || { echo "Failed to rename $APP_NAME adding -old"; exit 1; }
 fi
 
-# Rename actual varnish version to -old
-if cf app "varnish" > /dev/null 2>&1; then
-  cf rename varnish "varnish-old" || { echo "Failed to rename varnish adding -old"; exit 1; }
-fi
 
 # Push the app
 echo "Pushing $APP_NAME"
 if [[ -n "$STACK" ]]; then
-  cf push -f $MANIFEST -s "$STACK" || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; }
+  cf push -f $MANIFEST -s "$STACK" --no-route || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; }
 else
-  cf push -f $MANIFEST || { echo "Failed to push $APP_NAME"; exit 1; }
+  cf push -f $MANIFEST --no-route || { echo "Failed to push $APP_NAME"; exit 1; }
 fi
-
-# Push the varnish app
-echo "Pushing varnish"
-cf push -f $VARNISH_MANIFEST || { echo "Failed to push varnish"; exit 1; }
 
 # Add network policy if both SOURCE and DESTINATION are set
 echo "Adding network policy for communicate vanrnish to mongo"
 cf add-network-policy varnish "$APP_NAME" || { echo "Failed to add network policy"; exit 1; }
-cf restart varnish || { echo "Failed to restart $SOURCE for network policy set up"; exit 1; }
 
 # Verify if the new app is running
 if cf app "$APP_NAME" > /dev/null 2>&1; then
@@ -98,12 +66,11 @@ if cf app "$APP_NAME" > /dev/null 2>&1; then
   APP_STATE=$(cf curl "/v2/apps/$APP_GUID/stats" | jq -r '."0".state' 2>/dev/null)
 
   if [[ "$APP_STATE" == "RUNNING" ]]; then
+    cf apply-manifest -f $MANIFEST
     if cf app "$APP_NAME-old" > /dev/null 2>&1; then
       cf delete "$APP_NAME-old" -f || { echo "Failed to delete $APP_NAME-old"; exit 1; }
     fi
-    if cf app "varnish-old" > /dev/null 2>&1; then
-      cf delete "varnish-old" -f || { echo "Failed to delete $APP_NAME-old"; exit 1; }
-    fi
+    cf restart varnish || { echo "Failed to restart $SOURCE for network policy set up"; exit 1; }
   else
     echo "Warning: $APP_NAME is not running. Check the logs for details."
   fi
