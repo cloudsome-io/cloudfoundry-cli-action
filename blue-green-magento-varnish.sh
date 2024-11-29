@@ -61,7 +61,7 @@ if cf app "$APP_NAME-old" > /dev/null 2>&1; then
 fi
 
 # Check if the varnish exists and manage old app versions
-if cf app "varnis-old" > /dev/null 2>&1; then
+if cf app "varnish-old" > /dev/null 2>&1; then
   cf delete "varnish-old" -f || { echo "Failed to delete varnish-old"; exit 1; }
 fi
 
