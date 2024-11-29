@@ -22,7 +22,7 @@ jobs:
     deploy:
         runs-on: ubuntu-latest
         steps:
-        - uses: cloudsome-io/cloudfoundry-cli-action@v7.4.6
+        - uses: cloudsome-io/cloudfoundry-cli-action@v7.5.2
           with:
             CF_API: https://api.my-cloud-foundry.com
             USERNAME: ${{ secrets.CF_USER }}
@@ -41,10 +41,27 @@ Optionally you can specify
 
 
 ```yml
-- uses: cloudsome-io/cloudfoundry-cli-action@v7.4.6
+- uses: cloudsome-io/cloudfoundry-cli-action@v7.5.2
   with:
     CF_API: https://api.my-cloud-foundry.com
     USERNAME: ${{ secrets.CF_USER }}
     PASSWORD: ${{ secrets.CF_PASSWORD }}
     COMMAND: blue-green <app-name> [--stack stack_name] [--source source_app --destination destination_app]
+```
+
+
+## blue green deployment for magento and varnish
+For blue green deployment, you can use the `blue-green-magento-varnish.sh` script to deploy your magento installation with varnish.  
+This script will deploy the app to the staging space and then swap the routes to point to the new app.
+Optionally you can specify
+* `--varnish-manifest` the path to the varnish manifest
+
+
+```yml
+- uses: cloudsome-io/cloudfoundry-cli-action@v7.5.2
+  with:
+    CF_API: https://api.my-cloud-foundry.com
+    USERNAME: ${{ secrets.CF_USER }}
+    PASSWORD: ${{ secrets.CF_PASSWORD }}
+    COMMAND: blue-green-magento-varnish <app-name> [--varnish-manifest path]
 ```

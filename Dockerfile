@@ -12,4 +12,7 @@ ADD entrypoint.sh /entrypoint.sh
 COPY blue-green.sh /usr/local/bin/blue-green
 RUN chmod +x /usr/local/bin/blue-green
 
+COPY blue-green-magento-varnish.sh /usr/local/bin/blue-green-magento-varnish
+RUN chmod +x /usr/local/bin/blue-green-magento-varnish
+
 ENTRYPOINT ["/entrypoint.sh"]
