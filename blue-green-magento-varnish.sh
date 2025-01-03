@@ -51,14 +51,15 @@ fi
 # Push the app
 echo "Pushing $APP_NAME"
 if [[ -n "$STACK" ]]; then
-  cf push -f $MANIFEST -s "$STACK" --no-route || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; }
+  cf push -f $MANIFEST -s "$STACK" --no-route || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; } # TODO: insert here the restore command.
 else
   cf push -f $MANIFEST --no-route || { echo "Failed to push $APP_NAME"; exit 1; }
 fi
 
 # Add network policy if both SOURCE and DESTINATION are set
-echo "Adding network policy for communicate vanrnish to mongo"
+echo "Adding network policy for communicate vanrnish to Magento"
 cf add-network-policy varnish "$APP_NAME" || { echo "Failed to add network policy"; exit 1; }
+cf add-network-policy "$APP_NAME" varnish --protocolo tcp --port 80 || { echo "Failed to add network policy"; exit 1; }
 
 # Verify if the new app is running
 if cf app "$APP_NAME" > /dev/null 2>&1; then
