@@ -47,31 +47,43 @@ if cf app "$APP_NAME" > /dev/null 2>&1; then
   cf rename "$APP_NAME" "$APP_NAME-old" || { echo "Failed to rename $APP_NAME adding -old"; exit 1; }
 fi
 
-
-# Push the app
-echo "Pushing $APP_NAME"
-if [[ -n "$STACK" ]]; then
-  cf push -f $MANIFEST -s "$STACK" --no-route || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; } # TODO: insert here the restore command.
-else
-  cf push -f $MANIFEST --no-route || { echo "Failed to push $APP_NAME"; exit 1; }
-fi
+echo "Creating the app reference $APP_NAME-new"
+cf create-app "$APP_NAME-new" || { echo "Failed to add network policy"; exit 1; }
 
 # Add network policy if both SOURCE and DESTINATION are set
 echo "Adding network policy for communicate vanrnish to Magento"
-cf add-network-policy varnish "$APP_NAME" || { echo "Failed to add network policy"; exit 1; }
-cf add-network-policy "$APP_NAME" varnish --protocolo tcp --port 80 || { echo "Failed to add network policy"; exit 1; }
+cf add-network-policy varnish "$APP_NAME-new" || { echo "Failed to add network policy"; exit 1; }
+cf add-network-policy "$APP_NAME-new" varnish --protocol tcp --port 80 || { echo "Failed to add network policy"; exit 1; }
+
+
+# Push the app
+echo "Pushing $APP_NAME-new"
+if [[ -n "$STACK" ]]; then
+  cf push "$APP_NAME-new" -f $MANIFEST -s "$STACK" --no-route || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; } # TODO: insert here the restore command.
+else
+  cf push "$APP_NAME-new" -f $MANIFEST --no-route || { echo "Failed to push $APP_NAME"; exit 1; }
+fi
+
+
 
 # Verify if the new app is running
-if cf app "$APP_NAME" > /dev/null 2>&1; then
-  APP_GUID=$(cf app "$APP_NAME" --guid)
+if cf app "$APP_NAME-new" > /dev/null 2>&1; then
+  APP_GUID=$(cf app "$APP_NAME-new" --guid)
   APP_STATE=$(cf curl "/v2/apps/$APP_GUID/stats" | jq -r '."0".state' 2>/dev/null)
 
   if [[ "$APP_STATE" == "RUNNING" ]]; then
+    echo "Renaming $APP_NAME"
+    cf rename "$APP_NAME-new" $APP_NAME || { echo "Failed to rename $APP_NAME-new removing -new"; exit 1; }
+    
+    echo applying manfiest for route alignment
     cf apply-manifest -f $MANIFEST
+
     if cf app "$APP_NAME-old" > /dev/null 2>&1; then
       cf delete "$APP_NAME-old" -f || { echo "Failed to delete $APP_NAME-old"; exit 1; }
     fi
+    echo "Restarting varnish app"
     cf restart varnish || { echo "Failed to restart $SOURCE for network policy set up"; exit 1; }
+  
   else
     echo "Warning: $APP_NAME is not running. Check the logs for details."
   fi
