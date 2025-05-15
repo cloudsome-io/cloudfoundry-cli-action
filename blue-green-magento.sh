@@ -14,6 +14,14 @@ while [[ $# -gt 0 ]]; do
       MANIFEST="$2"
       shift # Skip the value
       ;;
+    --redis)
+      REDIS_APP_NAME="$2"
+      shift # Skip the value
+      ;;
+    --varnish)
+      VARNISH_APP_NAME="$2"
+      shift # Skip the value
+      ;;
     -*)
       echo "Unknown named argument: $1"
       exit 1
@@ -51,10 +59,15 @@ echo "Creating the app reference $APP_NAME-new"
 cf create-app "$APP_NAME-new" || { echo "Failed to add network policy"; exit 1; }
 
 # Add network policy if both SOURCE and DESTINATION are set
-echo "Adding network policy for communicate vanrnish to Magento"
-cf add-network-policy varnish "$APP_NAME-new" || { echo "Failed to add network policy"; exit 1; }
-cf add-network-policy "$APP_NAME-new" varnish --protocol tcp --port 80 || { echo "Failed to add network policy"; exit 1; }
-
+if [[ -n "$VARNISH_APP_NAME" ]]; then
+  echo "Adding network policy for communicate vanrnish to Magento"
+    cf add-network-policy "$VARNISH_APP_NAME" "$APP_NAME-new" || { echo "Failed to add network policy"; exit 1; }
+    cf add-network-policy "$APP_NAME-new" "$VARNISH_APP_NAME" --protocol tcp --port 80 || { echo "Failed to add network policy"; exit 1; }
+fi
+if [[ -n "$REDIS_APP_NAME" ]]; then
+  echo "Adding network policy for communicate $APP_NAME to Redis"
+  cf add-network-policy "$APP_NAME-new" "$REDIS_APP_NAME" --protocol tcp --port 6379|| { echo "Failed to add network policy for redis"; exit 1; }
+fi
 
 # Push the app
 echo "Pushing $APP_NAME-new"
@@ -74,8 +87,8 @@ if cf app "$APP_NAME-new" > /dev/null 2>&1; then
   if [[ "$APP_STATE" == "RUNNING" ]]; then
     echo "Renaming $APP_NAME"
     cf rename "$APP_NAME-new" $APP_NAME || { echo "Failed to rename $APP_NAME-new removing -new"; exit 1; }
-    
-    echo applying manfiest for route alignment
+
+    echo "applying manfiest for route alignment"
     cf apply-manifest -f $MANIFEST
 
     if cf app "$APP_NAME-old" > /dev/null 2>&1; then
@@ -83,7 +96,7 @@ if cf app "$APP_NAME-new" > /dev/null 2>&1; then
     fi
     echo "Restarting varnish app"
     cf restart varnish || { echo "Failed to restart $SOURCE for network policy set up"; exit 1; }
-  
+
   else
     echo "Warning: $APP_NAME is not running. Check the logs for details."
   fi

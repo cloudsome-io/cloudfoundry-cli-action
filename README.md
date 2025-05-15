@@ -36,7 +36,7 @@ jobs:
 For blue green deployment, you can use the `blue-green.sh` script to deploy your app.  
 This script will deploy the app to the staging space and then swap the routes to point to the new app.
 Optionally you can specify
-* `--stack` the stack name specification
+* `--stack stack_name` the stack name specification
 * `--source` and `--destination` The name of the source app and destination app for adding the network policy that will allow the communication between them
 
 
@@ -50,11 +50,14 @@ Optionally you can specify
 ```
 
 
-## blue green deployment for magento and varnish
+## blue green deployment for magento
 For blue green deployment, you can use the `blue-green-magento-varnish.sh` script to deploy your magento installation with varnish.  
 This script will deploy the app to the staging space and then swap the routes to point to the new app.
 Optionally you can specify
-* `--varnish-manifest` the path to the varnish manifest
+* `-f file_path` the path to the app manifest file
+* `--stack stack_name` the stack name specification
+* `--varnish varnish_app` the name of the varnish app for adding the network policy that will allow the communication between the app and varnish. The comunication will be done via port 80
+* `--redis redis_app` the name of the redis app for adding the network policy that will allow the communication between the app and redis. The communication will be done via port 6379
 
 
 ```yml
@@ -63,5 +66,5 @@ Optionally you can specify
     CF_API: https://api.my-cloud-foundry.com
     USERNAME: ${{ secrets.CF_USER }}
     PASSWORD: ${{ secrets.CF_PASSWORD }}
-    COMMAND: blue-green-magento-varnish <app-name> [--varnish-manifest path]
+    COMMAND: blue-green-magento-varnish <app-name> [-f path] [--stack stack_name] [--varnish varnish_app] [--redis redis_app]
 ```
