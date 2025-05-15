@@ -51,7 +51,7 @@ Optionally you can specify
 
 
 ## blue green deployment for magento
-For blue green deployment, you can use the `blue-green-magento-varnish.sh` script to deploy your magento installation with varnish.  
+For blue green deployment, you can use the `blue-green-magento.sh` script to deploy your magento installation with varnish.  
 This script will deploy the app to the staging space and then swap the routes to point to the new app.
 Optionally you can specify
 * `-f file_path` the path to the app manifest file
@@ -66,5 +66,5 @@ Optionally you can specify
     CF_API: https://api.my-cloud-foundry.com
     USERNAME: ${{ secrets.CF_USER }}
     PASSWORD: ${{ secrets.CF_PASSWORD }}
-    COMMAND: blue-green-magento-varnish <app-name> [-f path] [--stack stack_name] [--varnish varnish_app] [--redis redis_app]
+    COMMAND: blue-green-magento <app-name> [-f path] [--stack stack_name] [--varnish varnish_app] [--redis redis_app]
 ```
