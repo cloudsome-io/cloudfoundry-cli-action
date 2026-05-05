@@ -4,6 +4,7 @@ SOURCE=""
 DESTINATION=""
 MANIFEST="./manifest.yml"
 STACK=""
+TIMEOUT=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -18,6 +19,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --stack)
       STACK="$2"
+      shift # Skip the value
+      ;;
+    --timeout)
+      TIMEOUT="$2"
       shift # Skip the value
       ;;
     -f)
@@ -59,10 +64,12 @@ fi
 
 # Push the app
 echo "Pushing $APP_NAME"
+TIMEOUT_FLAG=""
+[[ -n "$TIMEOUT" ]] && TIMEOUT_FLAG="-t $TIMEOUT"
 if [[ -n "$STACK" ]]; then
-  cf push -f $MANIFEST -s "$STACK" || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; }
+  cf push -f $MANIFEST -s "$STACK" $TIMEOUT_FLAG || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; }
 else
-  cf push -f $MANIFEST || { echo "Failed to push $APP_NAME"; exit 1; }
+  cf push -f $MANIFEST $TIMEOUT_FLAG || { echo "Failed to push $APP_NAME"; exit 1; }
 fi
 
 # Add network policy if both SOURCE and DESTINATION are set

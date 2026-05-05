@@ -2,12 +2,17 @@
 
 MANIFEST="./manifest.yml"
 STACK=""
+TIMEOUT=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
     --stack)
       STACK="$2"
+      shift # Skip the value
+      ;;
+    --timeout)
+      TIMEOUT="$2"
       shift # Skip the value
       ;;
     -f)
@@ -60,7 +65,7 @@ cf create-app "$APP_NAME-new" || { echo "Failed to add network policy"; exit 1; 
 
 # Add network policy if both SOURCE and DESTINATION are set
 if [[ -n "$VARNISH_APP_NAME" ]]; then
-  echo "Adding network policy for communicate vanrnish to Magento"
+    echo "Adding network policy for communicate vanrnish to Magento"
     cf add-network-policy "$VARNISH_APP_NAME" "$APP_NAME-new" || { echo "Failed to add network policy"; exit 1; }
     cf add-network-policy "$APP_NAME-new" "$VARNISH_APP_NAME" --protocol tcp --port 80 || { echo "Failed to add network policy"; exit 1; }
 fi
@@ -71,10 +76,12 @@ fi
 
 # Push the app
 echo "Pushing $APP_NAME-new"
+TIMEOUT_FLAG=""
+[[ -n "$TIMEOUT" ]] && TIMEOUT_FLAG="-t $TIMEOUT"
 if [[ -n "$STACK" ]]; then
-  cf push "$APP_NAME-new" -f $MANIFEST -s "$STACK" --no-route || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; } # TODO: insert here the restore command.
+  cf push "$APP_NAME-new" -f $MANIFEST -s "$STACK" --no-route $TIMEOUT_FLAG || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; }
 else
-  cf push "$APP_NAME-new" -f $MANIFEST --no-route || { echo "Failed to push $APP_NAME"; exit 1; }
+  cf push "$APP_NAME-new" -f $MANIFEST --no-route $TIMEOUT_FLAG || { echo "Failed to push $APP_NAME"; exit 1; }
 fi
 
 

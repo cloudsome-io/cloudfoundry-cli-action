@@ -38,6 +38,7 @@ This script will deploy the app to the staging space and then swap the routes to
 Optionally you can specify
 * `--stack stack_name` the stack name specification
 * `--source` and `--destination` The name of the source app and destination app for adding the network policy that will allow the communication between them
+* `--timeout seconds` the app start timeout in seconds passed to `cf push -t`
 
 
 ```yml
@@ -46,7 +47,7 @@ Optionally you can specify
     CF_API: https://api.my-cloud-foundry.com
     USERNAME: ${{ secrets.CF_USER }}
     PASSWORD: ${{ secrets.CF_PASSWORD }}
-    COMMAND: blue-green <app-name> [--stack stack_name] [--source source_app --destination destination_app]
+    COMMAND: blue-green <app-name> [--stack stack_name] [--source source_app --destination destination_app] [--timeout seconds]
 ```
 
 
@@ -58,6 +59,7 @@ Optionally you can specify
 * `--stack stack_name` the stack name specification
 * `--varnish varnish_app` the name of the varnish app for adding the network policy that will allow the communication between the app and varnish. The comunication will be done via port 80
 * `--redis redis_app` the name of the redis app for adding the network policy that will allow the communication between the app and redis. The communication will be done via port 6379
+* `--timeout seconds` the app start timeout in seconds passed to `cf push -t`
 
 
 ```yml
@@ -66,5 +68,5 @@ Optionally you can specify
     CF_API: https://api.my-cloud-foundry.com
     USERNAME: ${{ secrets.CF_USER }}
     PASSWORD: ${{ secrets.CF_PASSWORD }}
-    COMMAND: blue-green-magento <app-name> [-f path] [--stack stack_name] [--varnish varnish_app] [--redis redis_app]
+    COMMAND: blue-green-magento <app-name> [-f path] [--stack stack_name] [--varnish varnish_app] [--redis redis_app] [--timeout seconds]
 ```
