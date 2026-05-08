@@ -77,7 +77,10 @@ fi
 # Push the app
 echo "Pushing $APP_NAME-new"
 TIMEOUT_FLAG=""
-[[ -n "$TIMEOUT" ]] && TIMEOUT_FLAG="-t $TIMEOUT"
+if [[ -n "$TIMEOUT" ]]; then
+  TIMEOUT_FLAG="-t $TIMEOUT"
+  export CF_STARTUP_TIMEOUT=$(( (TIMEOUT + 59) / 60 ))
+fi
 if [[ -n "$STACK" ]]; then
   cf push "$APP_NAME-new" -f $MANIFEST -s "$STACK" --no-route $TIMEOUT_FLAG || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; }
 else

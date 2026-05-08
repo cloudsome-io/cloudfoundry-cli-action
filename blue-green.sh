@@ -65,7 +65,10 @@ fi
 # Push the app
 echo "Pushing $APP_NAME"
 TIMEOUT_FLAG=""
-[[ -n "$TIMEOUT" ]] && TIMEOUT_FLAG="-t $TIMEOUT"
+if [[ -n "$TIMEOUT" ]]; then
+  TIMEOUT_FLAG="-t $TIMEOUT"
+  export CF_STARTUP_TIMEOUT=$(( (TIMEOUT + 59) / 60 ))
+fi
 if [[ -n "$STACK" ]]; then
   cf push -f $MANIFEST -s "$STACK" $TIMEOUT_FLAG || { echo "Failed to push $APP_NAME with stack $STACK"; exit 1; }
 else
